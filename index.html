@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UUID生成器・Flegertec</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            margin: 50px;
+        }
+
+        h1 {
+            color: #007BFF;
+        }
+
+        #uuid-display {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding: 0.8em;
+            border: 2px solid #007BFF;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+
+        #generate-button {
+            font-size: 1.2em;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+
+        #generate-button:hover {
+            background-color: #0056b3;
+        }
+
+        #copy-button {
+            font-size: 1.2em;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        #copy-button:hover {
+            background-color: #218838;
+        }
+
+        #copy-status {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>UUID生成器</h1>
+    <div id="uuid-display"></div>
+    <button id="generate-button" onclick="generateUUID()">生成</button>
+    <button id="copy-button" onclick="copyToClipboard()">コピー</button>
+    <div id="copy-status" style="color: green;"></div>
+
+    <script>
+        function generateUUID() {
+            function randomString(length) {
+                const chars = '0123456789abcdef';
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += chars[Math.floor(Math.random() * chars.length)];
+                }
+                return result;
+            }
+
+            function formatUUID(uuid) {
+                return `${uuid.substr(0, 8)}-${uuid.substr(8, 4)}-${uuid.substr(12, 4)}-${uuid.substr(16, 4)}-${uuid.substr(20, 12)}`;
+            }
+
+            const randomUUID = formatUUID(`${randomString(8)}${randomString(4)}${randomString(4)}${randomString(4)}${randomString(12)}`);
+
+            document.getElementById('uuid-display').textContent = randomUUID;
+        }
+
+        function copyToClipboard() {
+            const uuidDisplay = document.getElementById('uuid-display');
+            const textArea = document.createElement('textarea');
+            textArea.value = uuidDisplay.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+
+            const copyStatus = document.getElementById('copy-status');
+            copyStatus.textContent = 'コピーしました';
+
+            // 3秒後に表示を元に戻す
+            setTimeout(() => {
+                copyStatus.textContent = '';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
