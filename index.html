@@ -1,182 +1,295 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>UUIDジェネレーター・SK0528JP</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', system-ui, sans-serif;
-      background-color: #f9fafb;
-      color: #1f2937;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>UUIDジェネレーター・SK0528JP</title>
 
-    .container {
-      max-width: 600px;
-      margin: 60px auto;
-      padding: 2rem;
-      background-color: #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-      border-radius: 8px;
-    }
+    <link rel="icon" href="https://sk0528jp.github.io/images/favicon.ico" type="image/x-icon">
 
-    h1 {
-      font-size: 1.8rem;
-      margin-bottom: 0.5rem;
-      color: #0d47a1;
-    }
+    <style>
+        /* ポートフォリオサイトと同じフォントを読み込み */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        @font-face {
+            font-family: 'MiSans';
+            src: url('https://sk0528jp.github.io/font/MiSans-Normal.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
 
-    h2 {
-      font-size: 1rem;
-      margin-top: 0;
-      margin-bottom: 1.5rem;
-      color: #6b7280;
-      font-weight: normal;
-    }
+        :root {
+            --dark-bg: #121212;
+            --dark-surface: #1E1E1E;
+            --matcha-green: #5F7354;
+            --text-primary: #E8E8E8;
+            --text-secondary: #A0A0A0;
+            --font-family: 'MiSans', 'Roboto', sans-serif;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
 
-    .uuid-display {
-      font-family: 'Courier New', monospace;
-      font-size: 1.4rem;
-      padding: 1rem;
-      border: 1px solid #cbd5e1;
-      background-color: #f3f4f6;
-      border-radius: 4px;
-      word-break: break-word;
-      margin-bottom: 1.5rem;
-      text-align: center;
-      user-select: all;
-    }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    .buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
+        .container {
+            max-width: 600px;
+            width: 90%;
+            margin: auto;
+            padding: 2rem;
+            background-color: var(--dark-surface);
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            border: 1px solid #333;
+            position: relative; /* 言語切り替えボタンのために追加 */
+        }
 
-    @media(min-width: 500px) {
-      .buttons {
-        flex-direction: row;
-      }
-    }
+        .lang-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+        }
 
-    button {
-      flex: 1;
-      padding: 0.8rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s ease, transform 0.1s ease;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-    }
+        .lang-switcher button {
+            background: none;
+            border: 1px solid var(--text-secondary);
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border-radius: 32px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-    button:active {
-      transform: scale(0.98);
-    }
+        .lang-switcher button:hover {
+            background-color: rgba(95, 115, 84, 0.2);
+            color: var(--matcha-green);
+        }
 
-    #generate-button {
-      background-color: #1976d2;
-      color: #fff;
-    }
+        .lang-switcher button.active {
+            background-color: var(--matcha-green);
+            color: var(--dark-bg);
+            border-color: var(--matcha-green);
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--matcha-green);
+            border-bottom: 2px solid var(--matcha-green);
+            display: inline-block;
+            padding-bottom: 0.5rem;
+            font-weight: 700;
+        }
 
-    #generate-button:hover {
-      background-color: #1565c0;
-    }
+        h2 {
+            font-size: 1rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            font-weight: normal;
+        }
 
-    #copy-button {
-      background-color: #2e7d32;
-      color: #fff;
-    }
+        .uuid-display {
+            font-family: 'Courier New', monospace;
+            font-size: 1.4rem;
+            padding: 1rem;
+            border: 1px solid #444;
+            background-color: #2a2a2a;
+            border-radius: 4px;
+            word-break: break-word;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            user-select: all;
+            color: var(--text-primary);
+        }
 
-    #copy-button:hover {
-      background-color: #1b5e20;
-    }
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
 
-    .status {
-      margin-top: 1rem;
-      font-size: 0.95rem;
-      color: #388e3c;
-      text-align: center;
-    }
+        @media(min-width: 500px) {
+            .buttons {
+                flex-direction: row;
+            }
+        }
 
-    @media (prefers-color-scheme: dark) {
-      body {
-        background-color: #181818;
-        color: #d0d0d0;
-      }
+        button {
+            flex: 1;
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            font-family: var(--font-family);
+            font-weight: 500;
+        }
 
-      .container {
-        background-color: #232323;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      }
+        button:active {
+            transform: scale(0.98);
+        }
 
-      .uuid-display {
-        background-color: #2a2a2a;
-        border-color: #444;
-        color: #eeeeee;
-      }
+        #generate-button {
+            background-color: var(--matcha-green);
+            color: var(--dark-bg);
+        }
 
-      #generate-button {
-        background-color: #2196f3;
-      }
+        #generate-button:hover {
+            background-color: #7A8E6F;
+        }
 
-      #copy-button {
-        background-color: #4caf50;
-      }
+        #copy-button {
+            background-color: #607d8b;
+            color: #fff;
+        }
 
-      .status {
-        color: #81c784;
-      }
-    }
-  </style>
+        #copy-button:hover {
+            background-color: #546E7A;
+        }
+
+        .status {
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            color: var(--matcha-green);
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>UUIDジェネレーター</h1>
-    <h2>Made by SK0528JP</h2>
-    <div id="uuid-display" class="uuid-display" role="status" aria-live="polite"></div>
-    <div class="buttons">
-      <button id="generate-button" onclick="generateUUIDv4()" aria-label="UUIDを生成">生成</button>
-      <button id="copy-button" onclick="copyToClipboard()" aria-label="UUIDをコピー">コピー</button>
+    <div class="container">
+        <div class="lang-switcher">
+            <button id="lang-ja" class="active">日本語</button>
+            <button id="lang-en">English</button>
+            <button id="lang-sv">Svenska</button>
+        </div>
+
+        <h1 data-lang-ja="UUIDジェネレーター" data-lang-en="UUID Generator" data-lang-sv="UUID Generator">UUIDジェネレーター</h1>
+        <h2 data-lang-ja="Made by SK0528JP" data-lang-en="Made by SK0528JP" data-lang-sv="Gjord av SK0528JP">Made by SK0528JP</h2>
+        <div id="uuid-display" class="uuid-display" role="status" aria-live="polite"></div>
+        <div class="buttons">
+            <button id="generate-button" onclick="generateUUIDv4()" aria-label="UUIDを生成" data-lang-ja="生成" data-lang-en="Generate" data-lang-sv="Generera">生成</button>
+            <button id="copy-button" onclick="copyToClipboard()" aria-label="UUIDをコピー" data-lang-ja="コピー" data-lang-en="Copy" data-lang-sv="Kopiera">コピー</button>
+        </div>
+        <div id="copy-status" class="status"></div>
     </div>
-    <div id="copy-status" class="status"></div>
-  </div>
 
-  <script>
-    function generateUUIDv4() {
-      const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-        const r = Math.random() * 16 | 0;
-        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
-      document.getElementById('uuid-display').textContent = uuid;
-    }
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // UUID生成関数
+            function generateUUIDv4() {
+                const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+                document.getElementById('uuid-display').textContent = uuid;
+            }
 
-    async function copyToClipboard() {
-      const uuidText = document.getElementById('uuid-display').textContent;
-      const copyStatus = document.getElementById('copy-status');
+            // クリップボードコピー関数
+            async function copyToClipboard() {
+                const uuidText = document.getElementById('uuid-display').textContent;
+                const copyStatus = document.getElementById('copy-status');
 
-      if (!uuidText) {
-        copyStatus.textContent = 'UUID未生成';
-        copyStatus.style.color = 'red';
-        return;
-      }
+                if (!uuidText) {
+                    copyStatus.textContent = 'UUID未生成';
+                    copyStatus.style.color = 'red';
+                    setTimeout(() => { copyStatus.textContent = ''; }, 3000);
+                    return;
+                }
 
-      try {
-        await navigator.clipboard.writeText(uuidText);
-        copyStatus.textContent = 'コピーしました';
-        copyStatus.style.color = '#388e3c';
-      } catch {
-        copyStatus.textContent = 'コピー失敗';
-        copyStatus.style.color = 'red';
-      }
+                try {
+                    await navigator.clipboard.writeText(uuidText);
+                    const lang = document.querySelector('.lang-switcher button.active').id.replace('lang-', '');
+                    if (lang === 'ja') {
+                        copyStatus.textContent = 'コピーしました';
+                    } else if (lang === 'en') {
+                        copyStatus.textContent = 'Copied!';
+                    } else if (lang === 'sv') {
+                        copyStatus.textContent = 'Kopierad!';
+                    }
+                    copyStatus.style.color = 'var(--matcha-green)';
+                } catch {
+                    copyStatus.textContent = 'コピー失敗';
+                    copyStatus.style.color = 'red';
+                }
 
-      setTimeout(() => {
-        copyStatus.textContent = '';
-      }, 3000);
-    }
-  </script>
+                setTimeout(() => {
+                    copyStatus.textContent = '';
+                }, 3000);
+            }
+
+            // 言語切り替え機能
+            const langButtons = document.querySelectorAll('.lang-switcher button');
+            const elementsToTranslate = document.querySelectorAll('[data-lang-ja]');
+
+            const updateTexts = (lang) => {
+                elementsToTranslate.forEach(el => {
+                    el.textContent = el.getAttribute(`data-lang-${lang}`);
+                });
+                
+                // タイトルの変更
+                if (lang === 'ja') {
+                    document.title = "UUIDジェネレーター・SK0528JP";
+                } else if (lang === 'en') {
+                    document.title = "UUID Generator・SK0528JP";
+                } else if (lang === 'sv') {
+                    document.title = "UUID Generator・SK0528JP";
+                }
+
+                // コピーボタンのaria-labelも更新
+                const copyButton = document.getElementById('copy-button');
+                if (lang === 'ja') {
+                    copyButton.setAttribute('aria-label', 'UUIDをコピー');
+                } else if (lang === 'en') {
+                    copyButton.setAttribute('aria-label', 'Copy UUID');
+                } else if (lang === 'sv') {
+                    copyButton.setAttribute('aria-label', 'Kopiera UUID');
+                }
+
+                // 生成ボタンのaria-labelも更新
+                const generateButton = document.getElementById('generate-button');
+                if (lang === 'ja') {
+                    generateButton.setAttribute('aria-label', 'UUIDを生成');
+                } else if (lang === 'en') {
+                    generateButton.setAttribute('aria-label', 'Generate UUID');
+                } else if (lang === 'sv') {
+                    generateButton.setAttribute('aria-label', 'Generera UUID');
+                }
+            };
+
+            langButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    langButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    const lang = button.id.replace('lang-', '');
+                    updateTexts(lang);
+                });
+            });
+
+            // ボタンクリックイベントのリスナーを再設定
+            document.getElementById('generate-button').addEventListener('click', generateUUIDv4);
+            document.getElementById('copy-button').addEventListener('click', copyToClipboard);
+
+            // 初期ロード時に1回UUIDを生成
+            generateUUIDv4();
+        });
+
+        // ページ全体にイベントリスナーを設定しないために、onclick属性はそのまま
+    </script>
 </body>
 </html>
