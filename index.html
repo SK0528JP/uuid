@@ -107,20 +107,49 @@
             font-weight: normal;
         }
 
-        .uuid-display {
-            font-family: 'Courier New', monospace;
-            font-size: 1.4rem;
-            padding: 1rem;
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .controls label {
+            white-space: nowrap;
+        }
+        
+        .uuid-list {
+            max-height: 300px; /* スクロール可能にする */
+            overflow-y: auto;
             border: 1px solid #444;
             background-color: #2a2a2a;
             border-radius: 4px;
-            word-break: break-word;
+            padding: 1rem;
             margin-bottom: 1.5rem;
-            text-align: center;
-            user-select: all;
-            color: var(--text-primary);
         }
 
+        .uuid-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #333;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            word-break: break-all;
+            color: var(--text-primary);
+        }
+        
+        .uuid-item:last-child {
+            border-bottom: none;
+        }
+
+        .uuid-text {
+            flex: 1;
+            user-select: all;
+        }
+        
         .buttons {
             display: flex;
             flex-direction: column;
@@ -132,9 +161,8 @@
                 flex-direction: row;
             }
         }
-
+        
         button {
-            flex: 1;
             padding: 0.8rem;
             font-size: 1rem;
             border: none;
@@ -153,18 +181,22 @@
         #generate-button {
             background-color: var(--matcha-green);
             color: var(--dark-bg);
+            flex: 1;
         }
 
         #generate-button:hover {
             background-color: #7A8E6F;
         }
-
-        #copy-button {
+        
+        .copy-single-button {
             background-color: #607d8b;
             color: #fff;
+            padding: 0.5rem 0.8rem;
+            font-size: 0.9rem;
+            white-space: nowrap;
         }
 
-        #copy-button:hover {
+        .copy-single-button:hover {
             background-color: #546E7A;
         }
 
@@ -186,95 +218,107 @@
 
         <h1 data-lang-ja="UUIDジェネレーター" data-lang-en="UUID Generator" data-lang-sv="UUID Generator">UUIDジェネレーター</h1>
         <h2 data-lang-ja="Made by SK0528JP" data-lang-en="Made by SK0528JP" data-lang-sv="Gjord av SK0528JP">Made by SK0528JP</h2>
-        <div id="uuid-display" class="uuid-display" role="status" aria-live="polite"></div>
-        <div class="buttons">
-            <button id="generate-button" onclick="generateUUIDv4()" aria-label="UUIDを生成" data-lang-ja="生成" data-lang-en="Generate" data-lang-sv="Generera">生成</button>
-            <button id="copy-button" onclick="copyToClipboard()" aria-label="UUIDをコピー" data-lang-ja="コピー" data-lang-en="Copy" data-lang-sv="Kopiera">コピー</button>
+        
+        <div class="controls">
+            <label for="uuid-count" data-lang-ja="個数：" data-lang-en="Count:" data-lang-sv="Antal:">個数：</label>
+            <select id="uuid-count">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5" selected>5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+            <button id="generate-button" aria-label="UUIDを生成" data-lang-ja="生成" data-lang-en="Generate" data-lang-sv="Generera">生成</button>
         </div>
-        <div id="copy-status" class="status"></div>
+        
+        <div id="uuid-list" class="uuid-list"></div>
+        <div id="copy-status" class="status" aria-live="polite"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const uuidListContainer = document.getElementById('uuid-list');
+            const copyStatus = document.getElementById('copy-status');
+            const langButtons = document.querySelectorAll('.lang-switcher button');
+            const elementsToTranslate = document.querySelectorAll('[data-lang-ja]');
+            const generateButton = document.getElementById('generate-button');
+            const uuidCountSelect = document.getElementById('uuid-count');
+
             // UUID生成関数
-            function generateUUIDv4() {
-                const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+            const generateUUIDv4 = () => {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
                     const r = Math.random() * 16 | 0;
                     const v = c === 'x' ? r : (r & 0x3 | 0x8);
                     return v.toString(16);
                 });
-                document.getElementById('uuid-display').textContent = uuid;
-            }
+            };
 
-            // クリップボードコピー関数
-            async function copyToClipboard() {
-                const uuidText = document.getElementById('uuid-display').textContent;
-                const copyStatus = document.getElementById('copy-status');
-
-                if (!uuidText) {
-                    copyStatus.textContent = 'UUID未生成';
-                    copyStatus.style.color = 'red';
-                    setTimeout(() => { copyStatus.textContent = ''; }, 3000);
-                    return;
+            // 複数UUID生成＆表示関数
+            const generateMultipleUUIDs = () => {
+                const count = parseInt(uuidCountSelect.value, 10);
+                uuidListContainer.innerHTML = ''; // リストをクリア
+                for (let i = 0; i < count; i++) {
+                    const uuid = generateUUIDv4();
+                    const uuidItem = document.createElement('div');
+                    uuidItem.className = 'uuid-item';
+                    uuidItem.innerHTML = `
+                        <div class="uuid-text">${uuid}</div>
+                        <button class="copy-single-button" aria-label="UUIDをコピー" data-lang-ja="コピー" data-lang-en="Copy" data-lang-sv="Kopiera">コピー</button>
+                    `;
+                    uuidListContainer.appendChild(uuidItem);
                 }
+                copyStatus.textContent = ''; // ステータスメッセージをクリア
+                updateTexts(document.querySelector('.lang-switcher button.active').id.replace('lang-', ''));
+            };
 
-                try {
-                    await navigator.clipboard.writeText(uuidText);
-                    const lang = document.querySelector('.lang-switcher button.active').id.replace('lang-', '');
-                    if (lang === 'ja') {
-                        copyStatus.textContent = 'コピーしました';
-                    } else if (lang === 'en') {
-                        copyStatus.textContent = 'Copied!';
-                    } else if (lang === 'sv') {
-                        copyStatus.textContent = 'Kopierad!';
+            // 個別コピー関数 (イベントデリゲーションを使用)
+            uuidListContainer.addEventListener('click', async (event) => {
+                if (event.target && event.target.matches('.copy-single-button')) {
+                    const uuidText = event.target.previousElementSibling.textContent;
+                    try {
+                        await navigator.clipboard.writeText(uuidText);
+                        const lang = document.querySelector('.lang-switcher button.active').id.replace('lang-', '');
+                        if (lang === 'ja') {
+                            copyStatus.textContent = 'コピーしました';
+                            copyStatus.style.color = 'var(--matcha-green)';
+                        } else if (lang === 'en') {
+                            copyStatus.textContent = 'Copied!';
+                            copyStatus.style.color = 'var(--matcha-green)';
+                        } else if (lang === 'sv') {
+                            copyStatus.textContent = 'Kopierad!';
+                            copyStatus.style.color = 'var(--matcha-green)';
+                        }
+                    } catch {
+                        copyStatus.textContent = 'コピー失敗';
+                        copyStatus.style.color = 'red';
                     }
-                    copyStatus.style.color = 'var(--matcha-green)';
-                } catch {
-                    copyStatus.textContent = 'コピー失敗';
-                    copyStatus.style.color = 'red';
+                    setTimeout(() => { copyStatus.textContent = ''; }, 3000);
                 }
-
-                setTimeout(() => {
-                    copyStatus.textContent = '';
-                }, 3000);
-            }
+            });
 
             // 言語切り替え機能
-            const langButtons = document.querySelectorAll('.lang-switcher button');
-            const elementsToTranslate = document.querySelectorAll('[data-lang-ja]');
-
             const updateTexts = (lang) => {
                 elementsToTranslate.forEach(el => {
                     el.textContent = el.getAttribute(`data-lang-${lang}`);
                 });
                 
-                // タイトルの変更
-                if (lang === 'ja') {
-                    document.title = "UUIDジェネレーター・SK0528JP";
-                } else if (lang === 'en') {
-                    document.title = "UUID Generator・SK0528JP";
-                } else if (lang === 'sv') {
-                    document.title = "UUID Generator・SK0528JP";
-                }
-
-                // コピーボタンのaria-labelも更新
-                const copyButton = document.getElementById('copy-button');
-                if (lang === 'ja') {
-                    copyButton.setAttribute('aria-label', 'UUIDをコピー');
-                } else if (lang === 'en') {
-                    copyButton.setAttribute('aria-label', 'Copy UUID');
-                } else if (lang === 'sv') {
-                    copyButton.setAttribute('aria-label', 'Kopiera UUID');
-                }
-
-                // 生成ボタンのaria-labelも更新
-                const generateButton = document.getElementById('generate-button');
+                // タイトルとaria-labelの変更
+                const copyButtons = document.querySelectorAll('.copy-single-button');
+                document.title = document.querySelector('h1').textContent + '・SK0528JP';
                 if (lang === 'ja') {
                     generateButton.setAttribute('aria-label', 'UUIDを生成');
+                    copyButtons.forEach(btn => btn.setAttribute('aria-label', 'UUIDをコピー'));
                 } else if (lang === 'en') {
                     generateButton.setAttribute('aria-label', 'Generate UUID');
+                    copyButtons.forEach(btn => btn.setAttribute('aria-label', 'Copy UUID'));
                 } else if (lang === 'sv') {
                     generateButton.setAttribute('aria-label', 'Generera UUID');
+                    copyButtons.forEach(btn => btn.setAttribute('aria-label', 'Kopiera UUID'));
                 }
             };
 
@@ -287,12 +331,11 @@
                 });
             });
 
-            // ボタンクリックイベントのリスナーを再設定
-            document.getElementById('generate-button').addEventListener('click', generateUUIDv4);
-            document.getElementById('copy-button').addEventListener('click', copyToClipboard);
-
-            // 初期ロード時に1回UUIDを生成
-            generateUUIDv4();
+            // イベントリスナー設定
+            generateButton.addEventListener('click', generateMultipleUUIDs);
+            
+            // 初期ロード時に5個のUUIDを生成
+            generateMultipleUUIDs();
         });
     </script>
 </body>
