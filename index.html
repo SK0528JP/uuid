@@ -268,7 +268,7 @@
                     uuidItem.className = 'uuid-item';
                     uuidItem.innerHTML = `
                         <div class="uuid-text">${uuid}</div>
-                        <button class="copy-single-button" aria-label="UUIDをコピー" data-lang-ja="コピー" data-lang-en="Copy" data-lang-sv="Kopiera">コピー</button>
+                        <button class="copy-single-button" aria-label="" data-lang-ja="コピー" data-lang-en="Copy" data-lang-sv="Kopiera">コピー</button>
                     `;
                     uuidListContainer.appendChild(uuidItem);
                 }
@@ -303,6 +303,7 @@
 
             // 言語切り替え機能
             const updateTexts = (lang) => {
+                // 通常のテキスト要素を更新
                 elementsToTranslate.forEach(el => {
                     el.textContent = el.getAttribute(`data-lang-${lang}`);
                 });
@@ -312,13 +313,22 @@
                 document.title = document.querySelector('h1').textContent + '・SK0528JP';
                 if (lang === 'ja') {
                     generateButton.setAttribute('aria-label', 'UUIDを生成');
-                    copyButtons.forEach(btn => btn.setAttribute('aria-label', 'UUIDをコピー'));
+                    copyButtons.forEach(btn => {
+                        btn.textContent = 'コピー';
+                        btn.setAttribute('aria-label', 'UUIDをコピー');
+                    });
                 } else if (lang === 'en') {
                     generateButton.setAttribute('aria-label', 'Generate UUID');
-                    copyButtons.forEach(btn => btn.setAttribute('aria-label', 'Copy UUID'));
+                    copyButtons.forEach(btn => {
+                        btn.textContent = 'Copy';
+                        btn.setAttribute('aria-label', 'Copy UUID');
+                    });
                 } else if (lang === 'sv') {
                     generateButton.setAttribute('aria-label', 'Generera UUID');
-                    copyButtons.forEach(btn => btn.setAttribute('aria-label', 'Kopiera UUID'));
+                    copyButtons.forEach(btn => {
+                        btn.textContent = 'Kopiera';
+                        btn.setAttribute('aria-label', 'Kopiera UUID');
+                    });
                 }
             };
 
